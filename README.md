@@ -5,9 +5,9 @@ Simply mark your entities with annotation, create `EntityCodec` and that's it! T
 
 ## Why us it?
 - Simple and easy to use.
-- Using standard (MongoDB) way object manipulation.
+- Use standard (MongoDB) way for object manipulation.
 - Works for synchronous as well as asynchronous version of MongoDB Java Driver.
-- It's fast and small - only 12kb dependency.
+- It's fast and small - only 12kB dependency.
  
 
 ## Installation
@@ -92,7 +92,7 @@ correct getter and setter methods.
     ```
 
 ## Features
-- Entity reference - make sure all entities are annotated with `Entity`.
+- Entity reference - make sure all entities classes are annotated with `Entity`.
 - Feel free to create issue or pull request if you missing some functionality.
 
 ## Licence
