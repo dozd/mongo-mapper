@@ -1,13 +1,13 @@
 # mongo-mapper
 
 Mapping POJO for MongoDB has not been easier. Thanks to the new codecs feature in [MongoDB Java 3.0 driver](https://www.mongodb.com/blog/post/introducing-30-java-driver).
-Simply mark your entities with annotation and that's it!
+Simply mark your entities with annotation, create `EntityCodec` and that's it! Then use standard methods for storing and accessing data from MongoDB.
 
 ## Installation
 
 > Currently waiting for Maven Central approval.
 
-#### Maven
+##### Maven
 
 ```
 <dependency>
@@ -17,56 +17,76 @@ Simply mark your entities with annotation and that's it!
 </dependency>
 ```
 
-#### Gradle
+##### Gradle
 
 ```
 compile 'eu.dozd:mongo-mapper:1.0.0'
 ```
 
 ## Usage
-1. Mark your entities with annotation `Entitye`. Make sure every entity has exactly one String property marked as `Id`. All properties must have
+1. Mark your entities with annotation `Entity`. Make sure every entity has exactly one String property marked as `Id`. All properties must have
 correct getter and setter methods.
-```java
-import eu.dozd.mongo.annotation.Entity;
-import eu.dozd.mongo.annotation.Id;
 
-@Entity
-public class Person {
-    @Id
-    String id;
-
-    public String getId() {
-        return id;
+    ```java
+    import eu.dozd.mongo.annotation.Entity;
+    import eu.dozd.mongo.annotation.Id;
+    
+    @Entity
+    public class Person {
+        @Id
+        String id;
+        String name;
+        int age;
+    
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+        
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        
+        public int getAge() { return age; }
+        public void setAge(int age) { this.age = age; }
     }
+    ```
 
-    public void setId(String id) {
-        this.id = id;
-    }
-}
-```
 2. Initialize mapper codecs through `MongoMapper.getProviders`.
 
-```java
-    CodecRegistry codecRegistry = CodecRegistries.fromProviders(MongoMapper.getProviders());
-    MongoClientOptions settings = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
-
-    MongoClient client = new MongoClient(new ServerAddress(host, port), settings);
-```
-
+    - For standard driver:
+    
+        ```java
+            CodecRegistry codecRegistry = CodecRegistries.fromProviders(MongoMapper.getProviders());
+            MongoClientOptions settings = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
+        
+            MongoClient client = new MongoClient(new ServerAddress(host, port), settings);
+        ```
+    
+    - For asynchronous driver:
+    
+        ```java
+            CodecRegistry codecRegistry = CodecRegistries.fromProviders(MongoMapper.getProviders());
+            ClusterSettings clusterSettings = ClusterSettings.builder().hosts(Arrays.asList(new ServerAddress("localhost"))).build();
+            
+            MongoClient client = MongoClients.create(settings);
+        ```
+        
 3. Access and store data like normal POJO.
 
-```java
-    MongoCollection<Person> collection = db.getCollection("persons", Person.class);
+    ```java
+        MongoCollection<Person> collection = db.getCollection("persons", Person.class);
+    
+        Person person = new Person();
+        person.setName("Foo Bar");
+    
+        // Store person normally.
+        collection.insertOne(person);
+    
+        // Access data.
+        Person person2 = collection.find.first()
+    ```
 
-    Person person = new Person();
-    person.setName("Foo Bar");
-
-    // Store person normally.
-    collection.insertOne(person);
-
-    // Access data.
-    Person person2 = collection.find.first()
-```
+## Features
+- Entity reference - make sure all entities are marked with `Entity`.
+- Feel free to create ticket or pull request if you missing something.
 
 ## Licence
 Copyright 2015 Zdenek Dolezal
