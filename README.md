@@ -32,7 +32,7 @@ compile 'eu.dozd:mongo-mapper:1.0.0'
 
 ## Usage
 1. Annotate your entities with `Entity`. Make sure every entity has exactly one String annotated with `Id`. All properties must have
-correct getter and setter methods.
+correct getter and setter methods according Java Bean specification.
 
     ```java
     import eu.dozd.mongo.annotation.Entity;
@@ -56,22 +56,25 @@ correct getter and setter methods.
     }
     ```
 
-2. Create mapper codecs through `MongoMapper.getProviders`.
+2. Create mapper `CodecProvider` by calling `MongoMapper.getProviders`.
+    ```java
+    CodecRegistry codecRegistry = CodecRegistries.fromProviders(MongoMapper.getProviders());
+    ```
 
-    - For standard driver:
+    - Usage for standard driver:
     
         ```java
-            CodecRegistry codecRegistry = CodecRegistries.fromProviders(MongoMapper.getProviders());
             MongoClientOptions settings = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
         
-            MongoClient client = new MongoClient(new ServerAddress(host, port), settings);
+            MongoClient client = new MongoClient(new ServerAddress("localhost", 27017), settings);
         ```
     
-    - For asynchronous driver:
+    - Usage for asynchronous driver:
     
         ```java
-            CodecRegistry codecRegistry = CodecRegistries.fromProviders(MongoMapper.getProviders());
-            ClusterSettings clusterSettings = ClusterSettings.builder().hosts(Arrays.asList(new ServerAddress("localhost"))).build();
+            ClusterSettings clusterSettings = ClusterSettings.builder().hosts(Arrays.asList(new ServerAddress("localhost", 27017))).build();
+            MongoClientSettings settings = MongoClientSettings.builder().codecRegistry(codecRegistry)
+                                                .clusterSettings(clusterSettings).build();
             
             MongoClient client = MongoClients.create(settings);
         ```
