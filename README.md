@@ -12,7 +12,7 @@ Simply mark your entities with annotation, create `EntityCodec` and that's it! T
 
 ## Installation
 
-> Currently waiting for Maven Central approval.
+Mongo mapper is on Maven Central. Add following into your `pom.xml`.
 
 ##### Maven
 
