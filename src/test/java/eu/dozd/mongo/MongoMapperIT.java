@@ -35,8 +35,10 @@ public class MongoMapperIT {
 
     @After
     public void tearDown() throws Exception {
-        client.dropDatabase(dbName);
-        client.close();
+        if (client != null) {
+            client.dropDatabase(dbName);
+            client.close();
+        }
     }
 
     @Test
@@ -76,5 +78,19 @@ public class MongoMapperIT {
         Assert.assertEquals(entityRef.getTestEntity().getName(), returned.getTestEntity().getName());
         Assert.assertEquals(entityRef.getTestEntity().isChecked(), returned.getTestEntity().isChecked());
         Assert.assertEquals(entityRef.getTestEntity().getI(), returned.getTestEntity().getI());
+    }
+
+    @Test
+    public void testEnum() {
+        MongoCollection<TestEntityEnum> collection = db.getCollection("test_enum", TestEntityEnum.class);
+        collection.drop();
+
+        TestEntityEnum entityEnum = new TestEntityEnum();
+        entityEnum.setType(TestEntityEnum.Type.HIGH);
+
+        collection.insertOne(entityEnum);
+
+        TestEntityEnum returned = collection.find().first();
+        Assert.assertEquals(entityEnum.getType(), returned.getType());
     }
 }
