@@ -101,7 +101,8 @@ correct getter and setter methods according Java Bean specification.
 
 ## Other codecs
 - You can create other Codecs for you special classes.
-- Added [`BigDecimalCodec`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodec) and [`BigDecimalCodecProvider`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodecProvider) as an example.
+- Added [`BigDecimalCodec`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodec.java) 
+and [`BigDecimalCodecProvider`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodecProvider.java) as an example.
 
 ## Licence
 Copyright 2016 Zdenek Dolezal
