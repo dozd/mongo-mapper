@@ -1,7 +1,7 @@
 package eu.dozd.mongo;
 
-import eu.dozd.mongo.annotation.Entity;
 import eu.dozd.mongo.annotation.Id;
+import eu.dozd.mongo.entity.TestEntity;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

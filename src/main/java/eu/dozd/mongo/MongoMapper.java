@@ -1,5 +1,6 @@
 package eu.dozd.mongo;
 
+import eu.dozd.mongo.codecs.bigdecimal.BigDecimalCodecProvider;
 import org.bson.codecs.BsonValueCodecProvider;
 import org.bson.codecs.DocumentCodecProvider;
 import org.bson.codecs.ValueCodecProvider;
@@ -23,7 +24,8 @@ public class MongoMapper {
         return Arrays.asList(new ValueCodecProvider(),
                 new DocumentCodecProvider(),
                 new BsonValueCodecProvider(),
-                new MapperCodecProvider());
+                new MapperCodecProvider(),
+                new BigDecimalCodecProvider());
 
     }
 }

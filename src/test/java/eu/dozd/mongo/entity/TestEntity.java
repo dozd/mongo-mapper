@@ -1,4 +1,4 @@
-package eu.dozd.mongo;
+package eu.dozd.mongo.entity;
 
 import eu.dozd.mongo.annotation.Entity;
 import eu.dozd.mongo.annotation.Id;
@@ -11,6 +11,7 @@ public class TestEntity {
     private int i;
     private boolean checked;
     private String name;
+    private Integer j;
 
 
     public String getId() {
@@ -43,5 +44,13 @@ public class TestEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getJ() {
+        return j;
+    }
+
+    public void setJ(Integer j) {
+        this.j = j;
     }
 }

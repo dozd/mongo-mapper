@@ -1,5 +1,6 @@
 package eu.dozd.mongo;
 
+import eu.dozd.mongo.entity.TestEntity;
 import org.bson.codecs.Codec;
 import org.junit.Assert;
 import org.junit.Before;

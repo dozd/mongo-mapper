@@ -3,6 +3,7 @@ package eu.dozd.mongo;
 import org.bson.*;
 import org.bson.assertions.Assertions;
 import org.bson.codecs.*;
+import org.bson.codecs.configuration.CodecConfigurationException;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.types.ObjectId;
@@ -15,6 +16,7 @@ import java.util.UUID;
  * Codec used to decode and encode registered entities.
  */
 class EntityCodec<T> implements CollectibleCodec<T> {
+    private static final String ID_FIELD = "_id";
     private final Class<T> clazz;
     private final EntityInfo info;
     private final IdGenerator idGenerator;
@@ -63,9 +65,10 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         while (bsonReader.readBsonType() != BsonType.END_OF_DOCUMENT) {
             String fieldName = bsonReader.readName();
             if (info.isMappedReference(fieldName)) {
+                // Mapped reference to other entities should be decoded recursively.
                 document.put(fieldName, registry.get(info.getFieldType(fieldName)).decode(bsonReader, decoderContext));
             } else {
-                document.put(fieldName, readValue(bsonReader, decoderContext));
+                document.put(fieldName, readValue(bsonReader, decoderContext, fieldName));
             }
         }
 
@@ -80,7 +83,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
 
         for (String field : info.getFields()) {
             if (field.equals(info.getIdColumn())) {
-                info.setId(t, (String) document.get("_id"));
+                info.setId(t, (String) document.get(ID_FIELD));
             } else {
                 Object o;
                 o = document.get(field);
@@ -103,7 +106,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         for (String field : info.getFields()) {
             if (field.equals(info.getIdColumn())) {
                 if (documentHasId(t)) {
-                    document.put("_id", info.getId(t));
+                    document.put(ID_FIELD, info.getId(t));
                 }
             } else if (info.getFieldType(field).isEnum()) {
                 document.put(field, ((Enum) info.getValue(t, field)).name());
@@ -120,12 +123,31 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         return clazz;
     }
 
-    private Object readValue(final BsonReader reader, final DecoderContext decoderContext) {
+    private Object readValue(final BsonReader reader, final DecoderContext decoderContext, String fieldName) {
         BsonType bsonType = reader.getCurrentBsonType();
+
         if (bsonType == BsonType.NULL) {
             reader.readNull();
             return null;
-        } else if (bsonType == BsonType.ARRAY) {
+        }
+
+        Codec<?> codec = null;
+        if (!fieldName.equals(ID_FIELD)) {
+            // Check whether there is special codec for given field.
+            try {
+                codec = registry.get(info.getFieldType(fieldName));
+            } catch (CodecConfigurationException e) {
+                // No other way to check without catching exception.
+                codec = null;
+            }
+
+            if (codec != null) {
+                return codec.decode(reader, decoderContext);
+            }
+        }
+
+        // Fallback variant for other fields without codec from Document decoder.
+        if (bsonType == BsonType.ARRAY) {
             return readList(reader, decoderContext);
         } else if (bsonType == BsonType.BINARY) {
             byte bsonSubType = reader.peekBinarySubType();
@@ -140,7 +162,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         reader.readStartArray();
         List<Object> list = new ArrayList<Object>();
         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-            list.add(readValue(reader, decoderContext));
+            list.add(readValue(reader, decoderContext, null));
         }
         reader.readEndArray();
         return list;

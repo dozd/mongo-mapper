@@ -5,6 +5,10 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import eu.dozd.mongo.entity.TestEntity;
+import eu.dozd.mongo.entity.TestEntityBigDecimal;
+import eu.dozd.mongo.entity.TestEntityEnum;
+import eu.dozd.mongo.entity.TestEntityRef;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.junit.After;
@@ -12,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class MongoMapperIT {
@@ -50,6 +55,7 @@ public class MongoMapperIT {
         entity.setChecked(true);
         entity.setName("name");
         entity.setI(2);
+        entity.setJ(1);
 
         collection.insertOne(entity);
 
@@ -57,6 +63,7 @@ public class MongoMapperIT {
         Assert.assertEquals(entity.isChecked(), returned.isChecked());
         Assert.assertEquals(entity.getName(), returned.getName());
         Assert.assertEquals(entity.getI(), returned.getI());
+        Assert.assertEquals(entity.getJ(), returned.getJ());
     }
 
     @Test
@@ -92,5 +99,39 @@ public class MongoMapperIT {
 
         TestEntityEnum returned = collection.find().first();
         Assert.assertEquals(entityEnum.getType(), returned.getType());
+    }
+
+    @Test
+    public void testOtherCodec() {
+        MongoCollection<TestEntityBigDecimal> collection = db.getCollection("test_bigdecimal", TestEntityBigDecimal.class);
+        collection.drop();
+
+        TestEntityBigDecimal entity = new TestEntityBigDecimal();
+        entity.setBigNumber(BigDecimal.valueOf(1234124L, 3));
+
+        collection.insertOne(entity);
+
+        TestEntityBigDecimal returned = collection.find().first();
+        Assert.assertEquals(entity.getBigNumber(), returned.getBigNumber());
+    }
+
+    @Test
+    public void testNull() {
+        MongoCollection<TestEntity> collection = db.getCollection("test_null", TestEntity.class);
+        collection.drop();
+
+        TestEntity entity = new TestEntity();
+        entity.setChecked(true);
+        entity.setName(null);
+        entity.setI(2);
+        entity.setJ(null);
+
+        collection.insertOne(entity);
+
+        TestEntity returned = collection.find().first();
+        Assert.assertEquals(entity.isChecked(), returned.isChecked());
+        Assert.assertNull(returned.getName());
+        Assert.assertEquals(entity.getI(), returned.getI());
+        Assert.assertNull(returned.getJ());
     }
 }

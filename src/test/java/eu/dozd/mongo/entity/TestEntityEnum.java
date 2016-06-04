@@ -1,4 +1,4 @@
-package eu.dozd.mongo;
+package eu.dozd.mongo.entity;
 
 import eu.dozd.mongo.annotation.Entity;
 import eu.dozd.mongo.annotation.Id;

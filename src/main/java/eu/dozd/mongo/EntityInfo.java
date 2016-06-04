@@ -16,37 +16,40 @@ import java.util.*;
  * Class holding information about mapped classes and their fields.
  */
 class EntityInfo {
-    private String idColumn;
+    private final String idColumn;
     private final Map<String, PropertyDescriptor> fields = new HashMap<>();
 
-    public EntityInfo(Class<?> klass) {
+    public EntityInfo(Class<?> clazz) {
         PropertyDescriptor[] descriptors;
         try {
-            descriptors = Introspector.getBeanInfo(klass).getPropertyDescriptors();
+            descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
         } catch (IntrospectionException e) {
             throw new RuntimeException(e);
         }
 
         // Find ID property.
-        boolean idFound = false;
+        String idColumn = null;
         for (PropertyDescriptor pd : descriptors) {
 
             if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
                 Annotation[] declaredAnnotations = pd.getReadMethod().getDeclaredAnnotations();
                 for (Annotation annotation : declaredAnnotations) {
                     if (annotation.annotationType().equals(Id.class)) {
-                        setIdColumn(pd.getDisplayName());
-                        idFound = true;
+                        idColumn = pd.getDisplayName();
                         break;
                     }
                 }
             }
         }
 
-        if (!idFound && !findFieldAnnotation(klass)) {
-            throw new MongoMapperException("No ID field defined on class " + klass.getCanonicalName());
+        if (idColumn == null) {
+            idColumn = findIdAnnotation(clazz);
+            if (idColumn == null) {
+                throw new MongoMapperException("No ID field defined on class " + clazz.getCanonicalName());
+            }
         }
 
+        this.idColumn = idColumn;
         setDescriptors(Arrays.asList(descriptors));
     }
 
@@ -104,16 +107,15 @@ class EntityInfo {
         return (String) getValue(o, idColumn);
     }
 
-    private boolean findFieldAnnotation(Class<?> klass) {
+    private String findIdAnnotation(Class<?> klass) {
         for (Field field : klass.getDeclaredFields()) {
             for (Annotation annotation : field.getDeclaredAnnotations()) {
                 if (annotation.annotationType().equals(Id.class)) {
-                    setIdColumn(field.getName());
-                    return true;
+                    return field.getName();
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private PropertyDescriptor getField(String field) {
@@ -124,10 +126,6 @@ class EntityInfo {
         }
 
         return descriptor;
-    }
-
-    private void setIdColumn(String idColumn) {
-        this.idColumn = idColumn;
     }
 
     private void setDescriptors(List<PropertyDescriptor> descriptors) {
