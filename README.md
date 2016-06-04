@@ -20,14 +20,14 @@ Mongo mapper is on Maven Central. Add following into your `pom.xml`.
 <dependency>
     <groupId>eu.dozd</groupId>
     <artifactId>mongo-mapper</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```
-compile 'eu.dozd:mongo-mapper:1.0.1'
+compile 'eu.dozd:mongo-mapper:1.0.2'
 ```
 
 ## Usage
@@ -96,10 +96,15 @@ correct getter and setter methods according Java Bean specification.
 
 ## Features
 - Entity reference - make sure all entities classes are annotated with `Entity`.
+- Embedded entities - entities annotated with `Embedded` does not need to have an ID. 
 - Feel free to create issue or pull request if you missing some functionality.
 
+## Other codecs
+- You can create other Codecs for you special classes.
+- I added [`BigDecimalCodec`](src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodec) and [`BigDecimalCodecProvider`](src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodecProvider) as an example.
+
 ## Licence
-Copyright 2015 Zdenek Dolezal
+Copyright 2016 Zdenek Dolezal
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
