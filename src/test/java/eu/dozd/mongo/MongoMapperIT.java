@@ -5,10 +5,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import eu.dozd.mongo.entity.TestEntity;
-import eu.dozd.mongo.entity.TestEntityBigDecimal;
-import eu.dozd.mongo.entity.TestEntityEnum;
-import eu.dozd.mongo.entity.TestEntityRef;
+import eu.dozd.mongo.entity.*;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.junit.After;
@@ -133,5 +130,25 @@ public class MongoMapperIT {
         Assert.assertNull(returned.getName());
         Assert.assertEquals(entity.getI(), returned.getI());
         Assert.assertNull(returned.getJ());
+    }
+
+    @Test
+    public void testEmbedded() throws Exception {
+        MongoCollection<TestEntityWithEmbedded> collection = db.getCollection("test_embedded", TestEntityWithEmbedded.class);
+        collection.drop();
+
+        TestEntityEmbedded embedded = new TestEntityEmbedded();
+        embedded.setAge(1);
+        embedded.setName("testing");
+
+        TestEntityWithEmbedded entity = new TestEntityWithEmbedded();
+        entity.setName("embedded");
+        entity.setEmbedded(embedded);
+
+        collection.insertOne(entity);
+
+        TestEntityWithEmbedded returned = collection.find().first();
+        Assert.assertEquals(entity.getEmbedded(), returned.getEmbedded());
+        Assert.assertEquals(entity.getName(), returned.getName());
     }
 }

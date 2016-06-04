@@ -43,7 +43,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
 
     @Override
     public boolean documentHasId(T t) {
-        if (info.getIdColumn() != null) {
+        if (info.getIdField() != null) {
             String id = info.getId(t);
             return (id != null);
         }
@@ -82,7 +82,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         }
 
         for (String field : info.getFields()) {
-            if (field.equals(info.getIdColumn())) {
+            if (field.equals(info.getIdField())) {
                 info.setId(t, (String) document.get(ID_FIELD));
             } else {
                 Object o;
@@ -104,7 +104,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         Document document = new Document();
 
         for (String field : info.getFields()) {
-            if (field.equals(info.getIdColumn())) {
+            if (field.equals(info.getIdField())) {
                 if (documentHasId(t)) {
                     document.put(ID_FIELD, info.getId(t));
                 }

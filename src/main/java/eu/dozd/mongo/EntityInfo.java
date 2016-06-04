@@ -1,13 +1,10 @@
 package eu.dozd.mongo;
 
 import eu.dozd.mongo.annotation.Entity;
-import eu.dozd.mongo.annotation.Id;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -16,53 +13,28 @@ import java.util.*;
  * Class holding information about mapped classes and their fields.
  */
 class EntityInfo {
-    private final String idColumn;
-    private final Map<String, PropertyDescriptor> fields = new HashMap<>();
+    protected final Map<String, PropertyDescriptor> fields = new HashMap<>();
+    protected final PropertyDescriptor[] descriptors;
 
-    public EntityInfo(Class<?> clazz) {
-        PropertyDescriptor[] descriptors;
+    EntityInfo(Class<?> clazz) {
         try {
             descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
         } catch (IntrospectionException e) {
             throw new RuntimeException(e);
         }
-
-        // Find ID property.
-        String idColumn = null;
-        for (PropertyDescriptor pd : descriptors) {
-
-            if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
-                Annotation[] declaredAnnotations = pd.getReadMethod().getDeclaredAnnotations();
-                for (Annotation annotation : declaredAnnotations) {
-                    if (annotation.annotationType().equals(Id.class)) {
-                        idColumn = pd.getDisplayName();
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (idColumn == null) {
-            idColumn = findIdAnnotation(clazz);
-            if (idColumn == null) {
-                throw new MongoMapperException("No ID field defined on class " + clazz.getCanonicalName());
-            }
-        }
-
-        this.idColumn = idColumn;
         setDescriptors(Arrays.asList(descriptors));
     }
 
-    public Set<String> getFields() {
+    Set<String> getFields() {
         return Collections.unmodifiableSet(fields.keySet());
     }
 
-    public String getIdColumn() {
-        return idColumn;
+    String getIdField() {
+        return null;
     }
 
-    public boolean isMappedReference(String field) {
-        if (! fields.containsKey(field)) {
+    boolean isMappedReference(String field) {
+        if (!fields.containsKey(field)) {
             return false;
         }
 
@@ -71,11 +43,11 @@ class EntityInfo {
     }
 
 
-    public Class<?> getFieldType(String field) {
+    Class<?> getFieldType(String field) {
         return getField(field).getPropertyType();
     }
 
-    public void setValue(Object o, String field, Object v) {
+    void setValue(Object o, String field, Object v) {
         Method writeMethod = getField(field).getWriteMethod();
         if (writeMethod == null) {
             throw new MongoMapperException("Setter for property [" + field + "] in class [" + o.getClass().getCanonicalName() + "] not found.");
@@ -88,7 +60,7 @@ class EntityInfo {
         }
     }
 
-    public Object getValue(Object o, String field) {
+    Object getValue(Object o, String field) {
         // Read method cannot be null because of check in constructor.
         Method readMethod = getField(field).getReadMethod();
 
@@ -99,22 +71,10 @@ class EntityInfo {
         }
     }
 
-    public void setId(Object o, String id) {
-        setValue(o, idColumn, id);
+    void setId(Object o, String id) {
     }
 
-    public String getId(Object o) {
-        return (String) getValue(o, idColumn);
-    }
-
-    private String findIdAnnotation(Class<?> klass) {
-        for (Field field : klass.getDeclaredFields()) {
-            for (Annotation annotation : field.getDeclaredAnnotations()) {
-                if (annotation.annotationType().equals(Id.class)) {
-                    return field.getName();
-                }
-            }
-        }
+    String getId(Object o) {
         return null;
     }
 
