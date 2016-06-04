@@ -99,6 +99,20 @@ public class MongoMapperIT {
     }
 
     @Test
+    public void testNullEnum() throws Exception {
+        MongoCollection<TestEntityEnum> collection = db.getCollection("test_enum2", TestEntityEnum.class);
+        collection.drop();
+
+        TestEntityEnum entityEnum = new TestEntityEnum();
+        entityEnum.setType(null);
+
+        collection.insertOne(entityEnum);
+
+        TestEntityEnum returned = collection.find().first();
+        Assert.assertNull(returned.getType());
+    }
+
+    @Test
     public void testOtherCodec() {
         MongoCollection<TestEntityBigDecimal> collection = db.getCollection("test_bigdecimal", TestEntityBigDecimal.class);
         collection.drop();

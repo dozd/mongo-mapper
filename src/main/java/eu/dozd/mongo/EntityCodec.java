@@ -89,10 +89,9 @@ class EntityCodec<T> implements CollectibleCodec<T> {
                 o = document.get(field);
 
                 if (info.getFieldType(field).isEnum()) {
-                    info.setValue(t, field, Enum.valueOf((Class<? extends Enum>) info.getFieldType(field), (String) o));
-                } else {
-                    info.setValue(t, field, o);
+                    o = o == null ? null : Enum.valueOf((Class<? extends Enum>) info.getFieldType(field), (String) o);
                 }
+                info.setValue(t, field, o);
             }
         }
 
@@ -109,7 +108,9 @@ class EntityCodec<T> implements CollectibleCodec<T> {
                     document.put(ID_FIELD, info.getId(t));
                 }
             } else if (info.getFieldType(field).isEnum()) {
-                document.put(field, ((Enum) info.getValue(t, field)).name());
+                Enum anEnum = (Enum) info.getValue(t, field);
+                String value = (anEnum == null) ? null : anEnum.name();
+                document.put(field, value);
             } else {
                 document.put(field, info.getValue(t, field));
             }
