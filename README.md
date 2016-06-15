@@ -19,14 +19,16 @@ Mongo mapper is on Maven Central. Add following into your `pom.xml`.
 <dependency>
     <groupId>eu.dozd</groupId>
     <artifactId>mongo-mapper</artifactId>
-    <version>1.0.3</version>
+    <version>1.x.x</version>
 </dependency>
 ```
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/eu.dozd/mongo-mapper/badge.svg?style=flat)](http://mvnrepository.com/artifact/eu.dozd/mongo-mapper)
 
 ##### Gradle
 
 ```
-compile 'eu.dozd:mongo-mapper:1.0.3'
+compile 'eu.dozd:mongo-mapper:1.x.x'
 ```
 
 ## Usage
