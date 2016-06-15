@@ -1,4 +1,4 @@
-# mongo-mapper
+# mongo-mapper [![Build Status](https://travis-ci.org/dozd/mongo-mapper.svg?branch=master)](https://travis-ci.org/dozd/mongo-mapper)
 
 Mapping POJO for MongoDB has not been easier. Thanks to the new codecs feature in [MongoDB Java 3.0 driver](https://www.mongodb.com/blog/post/introducing-30-java-driver).
 Simply mark your entities with annotation, create `EntityCodec` and that's it! Then use standard methods for storing and accessing data from MongoDB.
@@ -8,7 +8,6 @@ Simply mark your entities with annotation, create `EntityCodec` and that's it! T
 - Use standard (MongoDB) way for object manipulation.
 - Works for synchronous as well as asynchronous version of MongoDB Java Driver.
 - It's fast and small - only 13kB dependency.
- 
 
 ## Installation
 
