@@ -7,7 +7,7 @@ Simply mark your entities with annotation, create `EntityCodec` and that's it! T
 - Simple and easy to use.
 - Use standard (MongoDB) way for object manipulation.
 - Works for synchronous as well as asynchronous version of MongoDB Java Driver.
-- You can extend with your own codecs](#custom-codecs).
+- You can extend with your [own custom codecs](#custom-codecs).
 - It's fast and small - only 13kB dependency covered by unit and integration tests.
 
 ## Installation
