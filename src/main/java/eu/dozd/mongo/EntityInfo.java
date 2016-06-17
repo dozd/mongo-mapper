@@ -13,10 +13,13 @@ import java.util.*;
  * Class holding information about mapped classes and their fields.
  */
 class EntityInfo {
-    protected final Map<String, PropertyDescriptor> fields = new HashMap<>();
+    private final Map<String, PropertyDescriptor> fields = new HashMap<>();
+    private final String entityName;
+
     protected final PropertyDescriptor[] descriptors;
 
     EntityInfo(Class<?> clazz) {
+        entityName = clazz.getCanonicalName();
         try {
             descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
         } catch (IntrospectionException e) {
@@ -31,6 +34,10 @@ class EntityInfo {
 
     String getIdField() {
         return null;
+    }
+
+    String getEntityName() {
+        return entityName;
     }
 
     boolean isMappedReference(String field) {
@@ -82,7 +89,7 @@ class EntityInfo {
         PropertyDescriptor descriptor = fields.get(field);
 
         if (descriptor == null) {
-            throw new MongoMapperException("Cannot find definition for property [" + field + "]. Are you missing getter?");
+            throw new MongoMapperException("Cannot find definition for property [" + field + "] on class [" + getEntityName() + "]. Are you missing getter?");
         }
 
         return descriptor;

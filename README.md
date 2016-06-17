@@ -7,7 +7,8 @@ Simply mark your entities with annotation, create `EntityCodec` and that's it! T
 - Simple and easy to use.
 - Use standard (MongoDB) way for object manipulation.
 - Works for synchronous as well as asynchronous version of MongoDB Java Driver.
-- It's fast and small - only 13kB dependency.
+- You can extend with your own codecs](#custom-codecs).
+- It's fast and small - only 13kB dependency covered by unit and integration tests.
 
 ## Installation
 
@@ -100,10 +101,11 @@ correct getter and setter methods according Java Bean specification.
 - Embedded entities - entities annotated with `Embedded` does not need to have an ID. 
 - Feel free to create issue or pull request if you missing some functionality.
 
-## Other codecs
+## Custom codecs
 - You can create other Codecs for you special classes.
 - Added [`BigDecimalCodec`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodec.java) 
 and [`BigDecimalCodecProvider`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodecProvider.java) as an example.
+- Don't forget to call `MongoMapper.addProvider(yourCustomCodecProvider)`.
 
 ## Licence
 Copyright 2016 Zdenek Dolezal

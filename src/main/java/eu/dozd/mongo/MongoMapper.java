@@ -6,6 +6,7 @@ import org.bson.codecs.DocumentCodecProvider;
 import org.bson.codecs.ValueCodecProvider;
 import org.bson.codecs.configuration.CodecProvider;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,12 +21,19 @@ import java.util.List;
  * If you want modify or add other providers, instantiate MapperCodecProvider directly.
  */
 public class MongoMapper {
-    public static List<CodecProvider> getProviders() {
-        return Arrays.asList(new ValueCodecProvider(),
-                new DocumentCodecProvider(),
-                new BsonValueCodecProvider(),
-                new MapperCodecProvider(),
-                new BigDecimalCodecProvider());
+    private final static ArrayList<CodecProvider> providers = new ArrayList<>(Arrays.asList(
+            new ValueCodecProvider(),
+            new DocumentCodecProvider(),
+            new BsonValueCodecProvider(),
+            new MapperCodecProvider(),
+            new BigDecimalCodecProvider()
+    ));
 
+    public static List<CodecProvider> getProviders() {
+        return (ArrayList) providers.clone();
+    }
+
+    public static void addProvider(CodecProvider provider) {
+        providers.add(provider);
     }
 }

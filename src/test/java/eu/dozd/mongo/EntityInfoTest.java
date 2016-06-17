@@ -30,4 +30,9 @@ public class EntityInfoTest {
     public void testSetId() throws Exception {
         info.setId(null, null);
     }
+
+    @Test
+    public void testGetEntityName() throws Exception {
+        Assert.assertEquals("eu.dozd.mongo.entity.TestEntity", info.getEntityName());
+    }
 }
