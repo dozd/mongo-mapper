@@ -3,7 +3,6 @@ package eu.dozd.mongo.entity;
 import eu.dozd.mongo.annotation.Entity;
 import eu.dozd.mongo.annotation.Id;
 
-import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -14,7 +13,12 @@ public class TestEntityEnumMap {
 
     public enum QualityOfLife {
         BEST,
-        EVEN_BETTER
+        EVEN_BETTER;
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
     }
 
     private Map<QualityOfLife, Number> qualityOfLifeMap;
