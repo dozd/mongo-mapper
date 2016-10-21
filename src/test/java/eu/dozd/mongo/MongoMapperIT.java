@@ -2,11 +2,15 @@ package eu.dozd.mongo;
 
 import com.mongodb.client.MongoCollection;
 import eu.dozd.mongo.entity.*;
+
+import static eu.dozd.mongo.entity.TestEntityEnumMap.QualityOfLife.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MongoMapperIT extends AbstractMongoIT {
     @Test
@@ -177,5 +181,29 @@ public class MongoMapperIT extends AbstractMongoIT {
 
         TestEntityDoubleList returned = collection.find().first();
         Assert.assertEquals(entity.getDoubleList(), returned.getDoubleList());
+    }
+
+    @Test
+    public void testEnumMap() throws Exception {
+        MongoCollection<TestEntityEnumMap> collection = db.getCollection("test_embedded", TestEntityEnumMap.class);
+        collection.drop();
+
+        TestEntityEnumMap enumMapEntity = new TestEntityEnumMap();
+        final Map<TestEntityEnumMap.QualityOfLife, Number> enumMap = new HashMap<>();
+        enumMap.put(BEST, 5);
+        enumMap.put(EVEN_BETTER, 10);
+        enumMapEntity.setQualityOfLifeMap(enumMap);
+
+
+        TestEntityEnumMap entity = new TestEntityEnumMap();
+        final Map<TestEntityEnumMap.QualityOfLife, Number> expectedEnumMap = new HashMap<>();
+        expectedEnumMap.put(BEST, 5);
+        expectedEnumMap.put(EVEN_BETTER, 10);
+        entity.setQualityOfLifeMap(expectedEnumMap);
+
+        collection.insertOne(entity);
+
+        TestEntityEnumMap returned = collection.find().first();
+        Assert.assertEquals(entity.getQualityOfLifeMap(), returned.getQualityOfLifeMap());
     }
 }
