@@ -167,11 +167,8 @@ public class MongoMapperIT extends AbstractMongoIT {
 
     @Test
     public void testDoubleList() throws Exception {
-        MongoCollection<TestEntityDoubleList> collection = db.getCollection("test_embedded", TestEntityDoubleList.class);
+        MongoCollection<TestEntityDoubleList> collection = db.getCollection("test_doublelist", TestEntityDoubleList.class);
         collection.drop();
-
-        TestEntityDoubleList doubleList = new TestEntityDoubleList();
-        doubleList.setDoubleList(Arrays.asList(0.0, 6.5));
 
         TestEntityDoubleList entity = new TestEntityDoubleList();
         entity.setDoubleList(Arrays.asList(0.0, 6.5));

@@ -133,7 +133,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         }
 
         Codec<?> codec = null;
-        if (!fieldName.equals(ID_FIELD)) {
+        if (fieldName != null && !fieldName.equals(ID_FIELD)) {
             // Check whether there is special codec for given field.
             try {
                 codec = registry.get(info.getFieldType(fieldName));
