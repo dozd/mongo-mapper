@@ -11,13 +11,14 @@ public class MongoMapperTest {
     @Test
     public void testMongoMapper() throws Exception {
         List<CodecProvider> providers = MongoMapper.getProviders();
-        Assert.assertEquals(5, providers.size());
+        Assert.assertFalse(providers.isEmpty());
 
+        int size = providers.size();
         // Check for unmodifiable list.
         providers.add(new CustomFieldCodecProvider());
 
         MongoMapper.addProvider(new CustomFieldCodecProvider());
         providers = MongoMapper.getProviders();
-        Assert.assertEquals(6, providers.size());
+        Assert.assertEquals(size + 1, providers.size());
     }
 }
