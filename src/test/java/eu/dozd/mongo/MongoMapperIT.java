@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 public class MongoMapperIT extends AbstractMongoIT {
     @Test
@@ -129,5 +130,21 @@ public class MongoMapperIT extends AbstractMongoIT {
         TestEntityWithEmbedded returned = collection.find().first();
         Assert.assertEquals(entity.getEmbedded(), returned.getEmbedded());
         Assert.assertEquals(entity.getName(), returned.getName());
+    }
+    @Test
+    public void testDoubleList() throws Exception {
+        MongoCollection<TestEntityDoubleList> collection = db.getCollection("test_embedded", TestEntityDoubleList.class);
+        collection.drop();
+
+        TestEntityDoubleList doubleList = new TestEntityDoubleList();
+        doubleList.setDoubleList(Arrays.asList(0.0, 6.5));
+
+        TestEntityDoubleList entity = new TestEntityDoubleList();
+        entity.setDoubleList(Arrays.asList(0.0, 6.5));
+
+        collection.insertOne(entity);
+
+        TestEntityDoubleList returned = collection.find().first();
+        Assert.assertEquals(entity.getDoubleList(), returned.getDoubleList());
     }
 }
