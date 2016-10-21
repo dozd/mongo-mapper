@@ -23,7 +23,7 @@ public class AbstractMongoIT {
         MongoClientOptions settings = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
 
         String port = System.getProperty("embedMongoPort");
-        Assert.assertNotNull(port);
+        Assert.assertNotNull("Please, set system property 'embedMongoPort' to run this test outside Maven.", port);
 
         client = new MongoClient(new ServerAddress("127.0.0.1", Integer.parseInt(port)), settings);
         dbName = "mapper_test" + UUID.randomUUID();
