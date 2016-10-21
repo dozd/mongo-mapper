@@ -131,6 +131,25 @@ public class MongoMapperIT extends AbstractMongoIT {
         Assert.assertEquals(entity.getEmbedded(), returned.getEmbedded());
         Assert.assertEquals(entity.getName(), returned.getName());
     }
+
+    @Test
+    public void testMoreFields() throws Exception {
+        MongoCollection<TestEntity> collection = db.getCollection("test_morefields", TestEntity.class);
+        collection.drop();
+
+        TestEntity entity = new TestEntity();
+        entity.setName("a");
+        entity.setChecked(true);
+        entity.setJ(2);
+        collection.insertOne(entity);
+
+        MongoCollection<TestEntityRef> collection2 = db.getCollection("test_morefields", TestEntityRef.class);
+        TestEntityRef returned = collection2.find().first();
+
+        Assert.assertEquals(entity.getName(), returned.getName());
+        Assert.assertEquals(entity.getId(), returned.getId());
+    }
+
     @Test
     public void testDoubleList() throws Exception {
         MongoCollection<TestEntityDoubleList> collection = db.getCollection("test_embedded", TestEntityDoubleList.class);

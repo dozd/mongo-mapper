@@ -137,7 +137,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
             // Check whether there is special codec for given field.
             try {
                 codec = registry.get(info.getFieldType(fieldName));
-            } catch (CodecConfigurationException e) {
+            } catch (CodecConfigurationException | MongoMapperException e) {
                 // No other way to check without catching exception.
                 codec = null;
             }
