@@ -151,6 +151,21 @@ public class MongoMapperIT extends AbstractMongoIT {
     }
 
     @Test
+    public void testTransient() {
+        MongoCollection<TestEntityTransient> collection = db.getCollection("test_array", TestEntityTransient.class);
+        collection.drop();
+
+        TestEntityTransient entity = new TestEntityTransient();
+        entity.setNope("ahoj");
+
+        collection.insertOne(entity);
+
+        TestEntityTransient returned = collection.find().first();
+        Assert.assertNull(returned.getNope());
+
+    }
+
+    @Test
     public void testDoubleList() throws Exception {
         MongoCollection<TestEntityDoubleList> collection = db.getCollection("test_embedded", TestEntityDoubleList.class);
         collection.drop();

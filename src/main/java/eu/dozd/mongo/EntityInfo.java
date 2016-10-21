@@ -97,6 +97,12 @@ class EntityInfo {
 
     private void setDescriptors(List<PropertyDescriptor> descriptors) {
         for (PropertyDescriptor descriptor : descriptors) {
+            // Skip fields annotated with java.beans.Transient
+            Boolean tran = (Boolean) descriptor.getValue("transient");
+            if (tran != null && tran) {
+                continue;
+            }
+
             if (!"class".equals(descriptor.getName())) {
                 fields.put(descriptor.getDisplayName(), descriptor);
             }

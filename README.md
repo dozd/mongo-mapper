@@ -99,6 +99,7 @@ correct getter and setter methods according Java Bean specification.
 ## Features
 - Entity reference - make sure all entities classes are annotated with `Entity`.
 - Embedded entities - entities annotated with `Embedded` does not need to have an ID. 
+- @java.beans.Transient - annotated getter with it.
 - Feel free to create issue or pull request if you missing some functionality.
 
 ## Custom codecs
