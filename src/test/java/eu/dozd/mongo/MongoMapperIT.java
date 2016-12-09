@@ -90,7 +90,7 @@ public class MongoMapperIT extends AbstractMongoIT {
         collection.drop();
 
         TestEntityBigDecimal entity = new TestEntityBigDecimal();
-        entity.setBigNumber(BigDecimal.valueOf(1234124L, 3));
+        entity.setBigNumber(new BigDecimal("0.0100000000000000000000000001"));
 
         collection.insertOne(entity);
 
