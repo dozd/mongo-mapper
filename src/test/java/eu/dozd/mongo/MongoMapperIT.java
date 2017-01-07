@@ -209,4 +209,20 @@ public class MongoMapperIT extends AbstractMongoIT {
         TestEntityEnumMap returned = collection.find().first();
         Assert.assertEquals(entity.getQualityOfLifeMap(), returned.getQualityOfLifeMap());
     }
+
+    @Test
+    public void testReferenceMappingNull() {
+        MongoCollection<TestEntityRef> collection = db.getCollection("test_ref", TestEntityRef.class);
+        collection.drop();
+
+        TestEntityRef entityRef = new TestEntityRef();
+        entityRef.setName("ref");
+        entityRef.setTestEntity(null);
+
+        collection.insertOne(entityRef);
+
+        TestEntityRef returned = collection.find().first();
+        Assert.assertEquals(entityRef.getName(), returned.getName());
+        Assert.assertNull(entityRef.getTestEntity());
+    }
 }

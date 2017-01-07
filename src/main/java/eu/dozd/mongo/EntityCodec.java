@@ -58,6 +58,13 @@ class EntityCodec<T> implements CollectibleCodec<T> {
 
     @Override
     public T decode(BsonReader bsonReader, DecoderContext decoderContext) {
+        BsonType bsonType = bsonReader.getCurrentBsonType();
+
+        if (bsonType == BsonType.NULL) {
+            bsonReader.readNull();
+            return null;
+        }
+
         Document document = new Document();
 
         bsonReader.readStartDocument();
