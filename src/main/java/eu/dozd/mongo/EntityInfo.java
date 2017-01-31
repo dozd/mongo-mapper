@@ -7,6 +7,8 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -49,6 +51,43 @@ class EntityInfo {
         return pd.getPropertyType().isAnnotationPresent(Entity.class);
     }
 
+    boolean isMap(String field) {
+        if (!fields.containsKey(field)) {
+            return false;
+        }
+
+        PropertyDescriptor pd = getField(field);
+        return pd.getPropertyType().equals(Map.class);
+    }
+
+    Class<?> getMapValueType(String fieldName) {
+        if (!fields.containsKey(fieldName)) {
+            throw new IllegalArgumentException("Field " + fieldName + " not found.");
+        }
+
+        if (!isMap(fieldName)) {
+            throw new MongoMapperException("Field " + fieldName + " is not a map.");
+        }
+
+        PropertyDescriptor pd = getField(fieldName);
+        Type type = pd.getReadMethod().getGenericReturnType();
+        if (!(type instanceof ParameterizedType)) {
+            throw new MongoMapperException("Field " + fieldName + " is not a parametrized map with generic type.");
+        }
+
+        ParameterizedType pt = (ParameterizedType) type;
+        String className = pt.getActualTypeArguments()[1].getTypeName();
+        int i = className.indexOf("<");
+        if (i > -1) {
+            className = className.substring(0, i);
+        }
+
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new MongoMapperException("Class " + className + " not found.");
+        }
+    }
 
     Class<?> getFieldType(String field) {
         return getField(field).getPropertyType();

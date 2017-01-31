@@ -74,6 +74,8 @@ class EntityCodec<T> implements CollectibleCodec<T> {
             if (info.isMappedReference(fieldName)) {
                 // Mapped reference to other entities should be decoded recursively.
                 document.put(fieldName, registry.get(info.getFieldType(fieldName)).decode(bsonReader, decoderContext));
+            } else if (info.isMap(fieldName)) {
+                document.put(fieldName, decodeDocument(bsonReader, decoderContext, info.getMapValueType(fieldName)));
             } else {
                 document.put(fieldName, readValue(bsonReader, decoderContext, fieldName));
             }
@@ -103,6 +105,41 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         }
 
         return t;
+    }
+
+    public <V> Document decodeDocument(BsonReader bsonReader, DecoderContext decoderContext, Class<V> valueClazz) {
+        BsonType bsonType = bsonReader.getCurrentBsonType();
+
+        if (bsonType == BsonType.NULL) {
+            bsonReader.readNull();
+            return null;
+        }
+
+        Document document = new Document();
+
+        bsonReader.readStartDocument();
+        while (bsonReader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+            String fieldName = bsonReader.readName();
+            Codec<V> codec;
+            try {
+                codec = registry.get(valueClazz);
+            } catch (CodecConfigurationException | MongoMapperException e) {
+                // No other way to check without catching exception.
+                codec = null;
+            }
+
+            V decode;
+            if (codec != null) {
+                decode = codec.decode(bsonReader, decoderContext);
+            } else {
+                decode = (V) readValue(bsonReader, decoderContext, null);
+            }
+
+            document.put(fieldName, decode);
+        }
+
+        bsonReader.readEndDocument();
+        return document;
     }
 
     @Override

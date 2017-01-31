@@ -35,4 +35,9 @@ public class EntityInfoTest {
     public void testGetEntityName() throws Exception {
         Assert.assertEquals("eu.dozd.mongo.entity.TestEntity", info.getEntityName());
     }
+
+    @Test
+    public void testEntityMapValue() throws Exception {
+        Assert.assertEquals(Integer.class, info.getMapValueType("map"));
+    }
 }

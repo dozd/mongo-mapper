@@ -225,4 +225,45 @@ public class MongoMapperIT extends AbstractMongoIT {
         Assert.assertEquals(entityRef.getName(), returned.getName());
         Assert.assertNull(entityRef.getTestEntity());
     }
+
+    @Test
+    public void testMapEntityChild() {
+        MongoCollection<TestEntityMap> collection = db.getCollection("test_map", TestEntityMap.class);
+        collection.drop();
+
+        Map<String, TestEntityEmbedded> childs = new HashMap<>();
+        TestEntityEmbedded e1 = new TestEntityEmbedded();
+        e1.setAge(1);
+        e1.setName("child1");
+        childs.put("c1", e1);
+
+        TestEntityEmbedded e2 = new TestEntityEmbedded();
+        e2.setAge(2);
+        e2.setName("child2");
+        childs.put("c2", e2);
+
+        Map<String, Boolean> bools = new HashMap<>();
+        bools.put("b1", true);
+        bools.put("b2", false);
+
+        TestEntityMap entityRef = new TestEntityMap();
+        entityRef.setChilds(childs);
+        entityRef.setBools(bools);
+
+        collection.insertOne(entityRef);
+
+        TestEntityMap returned = collection.find().first();
+        Assert.assertEquals(childs.size(), returned.getChilds().size());
+        Assert.assertTrue(returned.getChilds().containsKey("c1"));
+        Assert.assertTrue(returned.getChilds().containsKey("c2"));
+        Assert.assertEquals(childs.get("c1").getAge(), returned.getChilds().get("c1").getAge());
+        Assert.assertEquals(childs.get("c1").getName(), returned.getChilds().get("c1").getName());
+        Assert.assertEquals(childs.get("c2").getAge(), returned.getChilds().get("c2").getAge());
+        Assert.assertEquals(childs.get("c2").getName(), returned.getChilds().get("c2").getName());
+
+        Assert.assertEquals(bools.size(), returned.getBools().size());
+        Assert.assertTrue(returned.getBools().containsKey("b1"));
+        Assert.assertTrue(returned.getBools().containsKey("b2"));
+        Assert.assertEquals(bools.get("b1"), returned.getBools().get("b1"));
+    }
 }

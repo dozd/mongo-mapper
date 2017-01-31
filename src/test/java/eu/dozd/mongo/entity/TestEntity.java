@@ -3,6 +3,8 @@ package eu.dozd.mongo.entity;
 import eu.dozd.mongo.annotation.Entity;
 import eu.dozd.mongo.annotation.Id;
 
+import java.util.Map;
+
 @Entity
 public class TestEntity {
 
@@ -12,6 +14,7 @@ public class TestEntity {
     private boolean checked;
     private String name;
     private Integer j;
+    private Map<String, Integer> map;
 
 
     public String getId() {
@@ -52,5 +55,13 @@ public class TestEntity {
 
     public void setJ(Integer j) {
         this.j = j;
+    }
+
+    public Map<String, Integer> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, Integer> map) {
+        this.map = map;
     }
 }
