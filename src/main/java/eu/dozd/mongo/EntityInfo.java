@@ -15,10 +15,9 @@ import java.util.*;
  * Class holding information about mapped classes and their fields.
  */
 class EntityInfo {
+    protected final PropertyDescriptor[] descriptors;
     private final Map<String, PropertyDescriptor> fields = new HashMap<>();
     private final String entityName;
-
-    protected final PropertyDescriptor[] descriptors;
 
     EntityInfo(Class<?> clazz) {
         entityName = clazz.getCanonicalName();
@@ -58,6 +57,43 @@ class EntityInfo {
 
         PropertyDescriptor pd = getField(field);
         return pd.getPropertyType().equals(Map.class);
+    }
+
+    boolean isGenericList(String field) {
+        if (!fields.containsKey(field)) {
+            return false;
+        }
+
+        PropertyDescriptor pd = getField(field);
+        if (!pd.getPropertyType().equals(List.class)) {
+            return false;
+        }
+        Type type = pd.getReadMethod().getGenericReturnType();
+        return (type instanceof ParameterizedType);
+    }
+
+    Class<?> getGenericListValueType(String fieldName) {
+        if (!fields.containsKey(fieldName)) {
+            throw new IllegalArgumentException("Field " + fieldName + " not found.");
+        }
+        if (!isGenericList(fieldName)) {
+            throw new MongoMapperException("Field " + fieldName + " is not a generic list.");
+        }
+
+        PropertyDescriptor pd = getField(fieldName);
+        Type type = pd.getReadMethod().getGenericReturnType();
+        if (!(type instanceof ParameterizedType)) {
+            throw new MongoMapperException("Field " + fieldName + " is not a generic list.");
+        }
+
+        ParameterizedType pt = (ParameterizedType) type;
+        String className = pt.getActualTypeArguments()[0].getTypeName();
+
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new MongoMapperException("Class " + className + " not found.");
+        }
     }
 
     Class<?> getMapValueType(String fieldName) {

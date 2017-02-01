@@ -76,6 +76,8 @@ class EntityCodec<T> implements CollectibleCodec<T> {
                 document.put(fieldName, registry.get(info.getFieldType(fieldName)).decode(bsonReader, decoderContext));
             } else if (info.isMap(fieldName)) {
                 document.put(fieldName, decodeDocument(bsonReader, decoderContext, info.getMapValueType(fieldName)));
+            } else if (info.isGenericList(fieldName)) {
+                document.put(fieldName, readGenericList(bsonReader, decoderContext, info.getGenericListValueType(fieldName)));
             } else {
                 document.put(fieldName, readValue(bsonReader, decoderContext, fieldName));
             }
@@ -105,6 +107,37 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         }
 
         return t;
+    }
+
+    private <V> List<V> readGenericList(BsonReader bsonReader, DecoderContext decoderContext, Class<V> valueClazz) {
+        BsonType bsonType = bsonReader.getCurrentBsonType();
+
+        if (bsonType == BsonType.NULL) {
+            bsonReader.readNull();
+            return null;
+        }
+
+        bsonReader.readStartArray();
+        List<V> list = new ArrayList<>();
+        while (bsonReader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+            Codec<V> codec;
+            try {
+                codec = registry.get(valueClazz);
+            } catch (CodecConfigurationException | MongoMapperException e) {
+                // No other way to check without catching exception.
+                codec = null;
+            }
+
+            V decode;
+            if (codec != null) {
+                decode = codec.decode(bsonReader, decoderContext);
+            } else {
+                decode = (V) readValue(bsonReader, decoderContext, null);
+            }
+            list.add(decode);
+        }
+        bsonReader.readEndArray();
+        return list;
     }
 
     public <V> Document decodeDocument(BsonReader bsonReader, DecoderContext decoderContext, Class<V> valueClazz) {
