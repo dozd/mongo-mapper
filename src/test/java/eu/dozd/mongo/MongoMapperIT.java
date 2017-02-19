@@ -7,6 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -265,5 +266,33 @@ public class MongoMapperIT extends AbstractMongoIT {
         Assert.assertTrue(returned.getBools().containsKey("b1"));
         Assert.assertTrue(returned.getBools().containsKey("b2"));
         Assert.assertEquals(bools.get("b1"), returned.getBools().get("b1"));
+    }
+
+    @Test
+    public void testGenericList() {
+        MongoCollection<TestEntityList> collection = db.getCollection("test_list", TestEntityList.class);
+        collection.drop();
+
+        TestEntityEmbedded embeddedEntity1 = new TestEntityEmbedded();
+        embeddedEntity1.setName("Entity 1");
+        embeddedEntity1.setAge(1);
+
+        TestEntityEmbedded embeddedEntity2 = new TestEntityEmbedded();
+        embeddedEntity2.setName("Entity 2");
+        embeddedEntity2.setAge(2);
+
+        ArrayList<TestEntityEmbedded> list = new ArrayList<>();
+        list.add(embeddedEntity1);
+        list.add(embeddedEntity2);
+
+        TestEntityList entity = new TestEntityList();
+        entity.setList(list);
+
+        collection.insertOne(entity);
+
+        TestEntityList returned = collection.find().first();
+        Assert.assertEquals(entity.getList().size(), entity.getList().size());
+        Assert.assertEquals(entity.getList().get(0), returned.getList().get(0));
+        Assert.assertEquals(entity.getList().get(1), returned.getList().get(1));
     }
 }
