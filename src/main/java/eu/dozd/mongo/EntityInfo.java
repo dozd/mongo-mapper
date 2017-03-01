@@ -153,10 +153,10 @@ class EntityInfo {
         }
     }
 
-    void setId(Object o, String id) {
+    void setId(Object o, Object id) {
     }
 
-    String getId(Object o) {
+    Object getId(Object o) {
         return null;
     }
 

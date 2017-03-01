@@ -1,6 +1,7 @@
 package eu.dozd.mongo;
 
 import eu.dozd.mongo.annotation.Id;
+import org.bson.types.ObjectId;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -49,12 +50,16 @@ public class EntityInfoWithId extends EntityInfo {
         return null;
     }
 
-    void setId(Object o, String id) {
-        setValue(o, idField, id);
+    void setId(Object o, Object id) {
+        if (getFieldType(idField).equals(String.class) && id instanceof ObjectId) {
+            setValue(o, idField, id.toString());
+        } else {
+            setValue(o, idField, id);
+        }
     }
 
-    String getId(Object o) {
-        return (String) getValue(o, idField);
+    Object getId(Object o) {
+        return getValue(o, idField);
     }
 
     String getIdField() {

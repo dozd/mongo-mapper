@@ -2,6 +2,7 @@ package eu.dozd.mongo;
 
 import eu.dozd.mongo.annotation.Id;
 import eu.dozd.mongo.entity.TestEntity;
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,13 @@ public class EntityInfoWithIdTest {
     public void testEntitySetId() {
         info.setId(entity, "test");
         Assert.assertEquals("test", entity.getId());
+    }
+
+    @Test
+    public void testEntitySetObjectId() throws Exception {
+        info.setId(entity, new ObjectId("58b724ec1e558b174ce32eb6"));
+        Assert.assertEquals("58b724ec1e558b174ce32eb6", entity.getId());
+
     }
 
     @Test

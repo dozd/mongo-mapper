@@ -291,8 +291,22 @@ public class MongoMapperIT extends AbstractMongoIT {
         collection.insertOne(entity);
 
         TestEntityList returned = collection.find().first();
-        Assert.assertEquals(entity.getList().size(), entity.getList().size());
+        Assert.assertEquals(entity.getList().size(), returned.getList().size());
         Assert.assertEquals(entity.getList().get(0), returned.getList().get(0));
         Assert.assertEquals(entity.getList().get(1), returned.getList().get(1));
+    }
+
+    @Test
+    public void testObjectId() {
+        MongoCollection<TestEntityObjectId> collection = db.getCollection("test_objectid", TestEntityObjectId.class);
+        collection.drop();
+
+        TestEntityObjectId entity = new TestEntityObjectId();
+        entity.setName("testName");
+
+        collection.insertOne(entity);
+
+        TestEntityObjectId returned = collection.find().first();
+        Assert.assertEquals(entity.getName(), returned.getName());
     }
 }

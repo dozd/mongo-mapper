@@ -36,7 +36,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
     @Override
     public T generateIdIfAbsentFromDocument(T t) {
         if (!documentHasId(t)) {
-            info.setId(t, idGenerator.generate().toString());
+            info.setId(t, idGenerator.generate());
         }
         return t;
     }
@@ -44,7 +44,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
     @Override
     public boolean documentHasId(T t) {
         if (info.getIdField() != null) {
-            String id = info.getId(t);
+            Object id = info.getId(t);
             return (id != null);
         }
         return false;
@@ -52,8 +52,16 @@ class EntityCodec<T> implements CollectibleCodec<T> {
 
     @Override
     public BsonValue getDocumentId(T t) {
-        String id = info.getId(t);
-        return new BsonObjectId(new ObjectId(id));
+        Object id = info.getId(t);
+        ObjectId documentId;
+        if (id instanceof ObjectId) {
+            documentId = (ObjectId) id;
+        } else if (id instanceof String) {
+            documentId = new ObjectId((String) id);
+        } else {
+            throw new MongoMapperException("Id can be the type of ObjectId or String.");
+        }
+        return new BsonObjectId(documentId);
     }
 
     @Override
@@ -94,7 +102,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
 
         for (String field : info.getFields()) {
             if (field.equals(info.getIdField())) {
-                info.setId(t, (String) document.get(ID_FIELD));
+                info.setId(t, document.get(ID_FIELD));
             } else {
                 Object o;
                 o = document.get(field);
