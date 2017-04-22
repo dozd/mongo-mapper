@@ -18,6 +18,7 @@ class EntityInfo {
     protected final PropertyDescriptor[] descriptors;
     private final Map<String, PropertyDescriptor> fields = new HashMap<>();
     private final String entityName;
+    private final Map<String, Class<?>> typeCache = new HashMap<>();
 
     EntityInfo(Class<?> clazz) {
         entityName = clazz.getCanonicalName();
@@ -76,8 +77,13 @@ class EntityInfo {
         if (!fields.containsKey(fieldName)) {
             throw new IllegalArgumentException("Field " + fieldName + " not found.");
         }
+
         if (!isGenericList(fieldName)) {
             throw new MongoMapperException("Field " + fieldName + " is not a generic list.");
+        }
+
+        if (typeCache.containsKey(fieldName)) {
+            return typeCache.get(fieldName);
         }
 
         PropertyDescriptor pd = getField(fieldName);
@@ -90,7 +96,9 @@ class EntityInfo {
         String className = pt.getActualTypeArguments()[0].getTypeName();
 
         try {
-            return Class.forName(className);
+            Class<?> aClass = Class.forName(className);
+            typeCache.put(fieldName, aClass);
+            return aClass;
         } catch (ClassNotFoundException e) {
             throw new MongoMapperException("Class " + className + " not found.");
         }
@@ -103,6 +111,10 @@ class EntityInfo {
 
         if (!isMap(fieldName)) {
             throw new MongoMapperException("Field " + fieldName + " is not a map.");
+        }
+
+        if (typeCache.containsKey(fieldName)) {
+            return typeCache.get(fieldName);
         }
 
         PropertyDescriptor pd = getField(fieldName);
@@ -119,7 +131,9 @@ class EntityInfo {
         }
 
         try {
-            return Class.forName(className);
+            Class<?> aClass = Class.forName(className);
+            typeCache.put(fieldName, aClass);
+            return aClass;
         } catch (ClassNotFoundException e) {
             throw new MongoMapperException("Class " + className + " not found.");
         }
@@ -127,6 +141,10 @@ class EntityInfo {
 
     Class<?> getFieldType(String field) {
         return getField(field).getPropertyType();
+    }
+
+    boolean hasField(String field) {
+        return fields.keySet().contains(field);
     }
 
     void setValue(Object o, String field, Object v) {

@@ -40,4 +40,10 @@ public class EntityInfoTest {
     public void testEntityMapValue() throws Exception {
         Assert.assertEquals(Integer.class, info.getMapValueType("map"));
     }
+
+    @Test
+    public void testHasFields() throws Exception {
+        Assert.assertTrue(info.hasField("name"));
+        Assert.assertFalse(info.hasField("name2"));
+    }
 }

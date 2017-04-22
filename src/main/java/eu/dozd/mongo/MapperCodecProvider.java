@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Mongo codec provider for mapped entites. Should be passed to Mongo configuration with other providers.
+ * Mongo codec provider for mapped entities. Should be passed to Mongo configuration with other providers.
  */
 public class MapperCodecProvider implements CodecProvider {
     private Map<Class, EntityInfo> entityMap = new HashMap<>();

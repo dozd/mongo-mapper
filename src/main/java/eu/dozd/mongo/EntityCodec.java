@@ -8,9 +8,7 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Codec used to decode and encode registered entities.
@@ -23,6 +21,8 @@ class EntityCodec<T> implements CollectibleCodec<T> {
     private final DocumentCodec documentCodec;
     private final BsonTypeClassMap bsonTypeClassMap;
     private final CodecRegistry registry;
+    private final List<Class<?>> ignoredTypes = new LinkedList<>();
+    private final Map<String, Class<?>> typeCache = new HashMap<>();
 
     public EntityCodec(Class<T> clazz, EntityInfo info) {
         this.clazz = clazz;
@@ -128,14 +128,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         bsonReader.readStartArray();
         List<V> list = new ArrayList<>();
         while (bsonReader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-            Codec<V> codec;
-            try {
-                codec = registry.get(valueClazz);
-            } catch (CodecConfigurationException | MongoMapperException e) {
-                // No other way to check without catching exception.
-                codec = null;
-            }
-
+            Codec<V> codec = getCodecForType(valueClazz);
             V decode;
             if (codec != null) {
                 decode = codec.decode(bsonReader, decoderContext);
@@ -161,14 +154,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         bsonReader.readStartDocument();
         while (bsonReader.readBsonType() != BsonType.END_OF_DOCUMENT) {
             String fieldName = bsonReader.readName();
-            Codec<V> codec;
-            try {
-                codec = registry.get(valueClazz);
-            } catch (CodecConfigurationException | MongoMapperException e) {
-                // No other way to check without catching exception.
-                codec = null;
-            }
-
+            Codec<V> codec = getCodecForType(valueClazz);
             V decode;
             if (codec != null) {
                 decode = codec.decode(bsonReader, decoderContext);
@@ -218,14 +204,9 @@ class EntityCodec<T> implements CollectibleCodec<T> {
         }
 
         Codec<?> codec = null;
-        if (fieldName != null && !fieldName.equals(ID_FIELD)) {
+        if (fieldName != null && !fieldName.equals(ID_FIELD) && info.hasField(fieldName)) {
             // Check whether there is special codec for given field.
-            try {
-                codec = registry.get(info.getFieldType(fieldName));
-            } catch (CodecConfigurationException | MongoMapperException e) {
-                // No other way to check without catching exception.
-                codec = null;
-            }
+            codec = getCodecForType(info.getFieldType(fieldName));
 
             if (codec != null) {
                 return codec.decode(reader, decoderContext);
@@ -242,6 +223,21 @@ class EntityCodec<T> implements CollectibleCodec<T> {
             }
         }
         return registry.get(bsonTypeClassMap.get(bsonType)).decode(reader, decoderContext);
+    }
+
+    private <V> Codec<V> getCodecForType(Class<V> fieldType) {
+        if (ignoredTypes.contains(fieldType)) {
+            return null;
+        }
+
+        try {
+            return registry.get(fieldType);
+        } catch (CodecConfigurationException | MongoMapperException e) {
+            // No other way to check without catching exception.
+            // Cache types without codec to improve performance
+            ignoredTypes.add(fieldType);
+        }
+        return null;
     }
 
     private List<Object> readList(final BsonReader reader, final DecoderContext decoderContext) {
