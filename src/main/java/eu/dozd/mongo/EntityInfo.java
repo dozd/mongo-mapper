@@ -155,8 +155,8 @@ class EntityInfo {
 
         try {
             writeMethod.invoke(o, v);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new MongoMapperException("Cannot set value for property [" + field + "] in class [" + o.getClass().getCanonicalName() + "].", e);
+        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            throw new MongoMapperException("Cannot set value [" + v + "] for property [" + field + "] in class [" + o.getClass().getCanonicalName() + "].", e);
         }
     }
 
