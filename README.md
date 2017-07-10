@@ -108,6 +108,12 @@ correct getter and setter methods according Java Bean specification.
 and [`BigDecimalCodecProvider`](https://github.com/dozd/mongo-mapper/tree/master/src/main/java/eu/dozd/mongo/codecs/bigdecimal/BigDecimalCodecProvider.java) as an example.
 - Don't forget to call `MongoMapper.addProvider(yourCustomCodecProvider)`.
 
+
+## Eclipse
+Eclipse uses its own Java compiler which is not strictly standard compliant and requires extra configuration.
+In Java Compiler -> Annotation Processing -> Factory Path you need to add ClassIndex jar file.
+See the [screenshot](https://github.com/atteo/classindex/issues/5#issuecomment-15365420).
+
 ## Licence
 Copyright 2016 Zdenek Dolezal
 
