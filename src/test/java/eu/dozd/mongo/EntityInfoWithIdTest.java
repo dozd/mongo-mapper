@@ -65,6 +65,18 @@ public class EntityInfoWithIdTest {
         i.setId(e, "1");
     }
 
+    private static class EntityJavax {
+        @javax.persistence.Id
+        private String id;
+    }
+
+    @Test(expected = MongoMapperException.class)
+    public void testEntityJavax() {
+        EntityJavax e = new EntityJavax();
+        EntityInfo i = new EntityInfoWithId(EntityJavax.class);
+        i.setId(e, "1");
+    }
+
     private static class EntityWithoutSetter {
         @Id
         private String id;

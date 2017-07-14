@@ -21,7 +21,7 @@ public class EntityInfoWithId extends EntityInfo {
             if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
                 Annotation[] declaredAnnotations = pd.getReadMethod().getDeclaredAnnotations();
                 for (Annotation annotation : declaredAnnotations) {
-                    if (annotation.annotationType().equals(Id.class)) {
+                    if (annotation.annotationType().equals(Id.class) || annotation.annotationType().equals(javax.persistence.Id.class)) {
                         idColumn = pd.getDisplayName();
                         break;
                     }
@@ -42,7 +42,7 @@ public class EntityInfoWithId extends EntityInfo {
     private String findIdAnnotation(Class<?> klass) {
         for (Field field : klass.getDeclaredFields()) {
             for (Annotation annotation : field.getDeclaredAnnotations()) {
-                if (annotation.annotationType().equals(Id.class)) {
+                if (annotation.annotationType().equals(Id.class) || annotation.annotationType().equals(javax.persistence.Id.class)) {
                     return field.getName();
                 }
             }
