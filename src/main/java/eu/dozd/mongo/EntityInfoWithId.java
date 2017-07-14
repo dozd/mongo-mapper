@@ -10,9 +10,15 @@ import java.lang.reflect.Field;
 public class EntityInfoWithId extends EntityInfo {
 
     private final String idField;
+    private final Class<?> idClass;
 
     EntityInfoWithId(Class<?> clazz) {
+        this(clazz, Id.class);
+    }
+
+    EntityInfoWithId(Class<?> clazz, Class<?> idClass) {
         super(clazz);
+        this.idClass = idClass;
 
         // Find ID property.
         String idColumn = null;
@@ -21,7 +27,7 @@ public class EntityInfoWithId extends EntityInfo {
             if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
                 Annotation[] declaredAnnotations = pd.getReadMethod().getDeclaredAnnotations();
                 for (Annotation annotation : declaredAnnotations) {
-                    if (annotation.annotationType().equals(Id.class) || annotation.annotationType().equals(javax.persistence.Id.class)) {
+                    if (annotation.annotationType().equals(idClass) || annotation.annotationType().equals(javax.persistence.Id.class)) {
                         idColumn = pd.getDisplayName();
                         break;
                     }
@@ -42,7 +48,7 @@ public class EntityInfoWithId extends EntityInfo {
     private String findIdAnnotation(Class<?> klass) {
         for (Field field : klass.getDeclaredFields()) {
             for (Annotation annotation : field.getDeclaredAnnotations()) {
-                if (annotation.annotationType().equals(Id.class) || annotation.annotationType().equals(javax.persistence.Id.class)) {
+                if (annotation.annotationType().equals(idClass) || annotation.annotationType().equals(javax.persistence.Id.class)) {
                     return field.getName();
                 }
             }

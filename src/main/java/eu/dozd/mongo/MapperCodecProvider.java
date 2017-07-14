@@ -2,10 +2,12 @@ package eu.dozd.mongo;
 
 import eu.dozd.mongo.annotation.Embedded;
 import eu.dozd.mongo.annotation.Entity;
+import eu.dozd.mongo.annotation.Id;
 import org.atteo.classindex.ClassIndex;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class MapperCodecProvider implements CodecProvider {
     public MapperCodecProvider() {
         // Standard mapped classes.
         for (Class<?> klass : ClassIndex.getAnnotated(Entity.class)) {
-            EntityInfo info = new EntityInfoWithId(klass);
+            EntityInfo info = new EntityInfoWithId(klass, Id.class);
             entityMap.put(klass, info);
         }
 
@@ -27,6 +29,23 @@ public class MapperCodecProvider implements CodecProvider {
         for (Class<?> klass : ClassIndex.getAnnotated(Embedded.class)) {
             EntityInfo info = new EntityInfo(klass);
             entityMap.put(klass, info);
+        }
+
+        boolean springOnClasspath;
+        try {
+            Class.forName("org.springframework.data.mongodb.core.mapping.Document", false, this.getClass().getClassLoader());
+            Class.forName("org.springframework.data.annotation.Id", false, this.getClass().getClassLoader());
+            springOnClasspath = true;
+        } catch (ClassNotFoundException e) {
+            springOnClasspath = false;
+        }
+
+        if (springOnClasspath) {
+            // Spring mapped classes.
+            for (Class<?> klass : ClassIndex.getAnnotated(Document.class)) {
+                EntityInfo info = new EntityInfoWithId(klass, org.springframework.data.annotation.Id.class);
+                entityMap.put(klass, info);
+            }
         }
     }
 
