@@ -181,9 +181,14 @@ class EntityCodec<T> implements CollectibleCodec<T> {
             } else if (info.getFieldType(field).isEnum()) {
                 Enum anEnum = (Enum) info.getValue(t, field);
                 String value = (anEnum == null) ? null : anEnum.name();
-                document.put(field, value);
+                if (value != null || !info.isNonNull(field)) {
+                    document.put(field, value);
+                }
             } else {
-                document.put(field, info.getValue(t, field));
+                Object value = info.getValue(t, field);
+                if (value != null || !info.isNonNull(field)) {
+                    document.put(field, info.getValue(t, field));
+                }
             }
         }
 

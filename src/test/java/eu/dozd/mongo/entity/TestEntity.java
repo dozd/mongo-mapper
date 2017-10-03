@@ -1,7 +1,6 @@
 package eu.dozd.mongo.entity;
 
-import eu.dozd.mongo.annotation.Entity;
-import eu.dozd.mongo.annotation.Id;
+import eu.dozd.mongo.annotation.*;
 
 import java.util.Map;
 
@@ -13,6 +12,7 @@ public class TestEntity {
     private int i;
     private boolean checked;
     private String name;
+    @NonNull
     private Integer j;
     private Map<String, Integer> map;
 

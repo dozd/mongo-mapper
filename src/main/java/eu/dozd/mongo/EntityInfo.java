@@ -1,6 +1,6 @@
 package eu.dozd.mongo;
 
-import eu.dozd.mongo.annotation.Entity;
+import eu.dozd.mongo.annotation.*;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -19,8 +19,10 @@ class EntityInfo {
     private final Map<String, PropertyDescriptor> fields = new HashMap<>();
     private final String entityName;
     private final Map<String, Class<?>> typeCache = new HashMap<>();
+    private final Class<?> clazz;
 
     EntityInfo(Class<?> clazz) {
+        this.clazz = clazz;
         entityName = clazz.getCanonicalName();
         try {
             descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
@@ -58,6 +60,27 @@ class EntityInfo {
 
         PropertyDescriptor pd = getField(field);
         return pd.getPropertyType().equals(Map.class);
+    }
+
+    boolean isNonNull(String field) {
+        if (!fields.containsKey(field)) {
+            return false;
+        }
+
+        if (clazz.isAnnotationPresent(NonNull.class)) {
+            return true;
+        }
+
+        try {
+            if (clazz.getDeclaredField(field).isAnnotationPresent(NonNull.class)) {
+                return true;
+            }
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+
+        PropertyDescriptor pd = getField(field);
+        return pd.getPropertyType().isAnnotationPresent(NonNull.class);
     }
 
     boolean isGenericList(String field) {

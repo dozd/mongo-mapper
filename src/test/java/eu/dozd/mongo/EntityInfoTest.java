@@ -46,4 +46,10 @@ public class EntityInfoTest {
         Assert.assertTrue(info.hasField("name"));
         Assert.assertFalse(info.hasField("name2"));
     }
+
+    @Test
+    public void testIsNonNull() throws Exception {
+        Assert.assertTrue(info.isNonNull("j"));
+        Assert.assertFalse(info.isNonNull("name"));
+    }
 }

@@ -2,6 +2,7 @@ package eu.dozd.mongo;
 
 import com.mongodb.client.MongoCollection;
 import eu.dozd.mongo.entity.*;
+import org.bson.*;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -117,6 +118,32 @@ public class MongoMapperIT extends AbstractMongoIT {
         Assert.assertNull(returned.getName());
         Assert.assertEquals(entity.getI(), returned.getI());
         Assert.assertNull(returned.getJ());
+    }
+
+    @Test
+    public void testNonNull() {
+        MongoCollection<TestEntity> collection = db.getCollection("test_nonnull", TestEntity.class);
+        collection.drop();
+
+        TestEntity entity = new TestEntity();
+        entity.setChecked(true);
+        entity.setName(null);
+        entity.setI(2);
+        entity.setJ(null);
+
+        collection.insertOne(entity);
+
+        TestEntity returned = collection.find().first();
+        Assert.assertEquals(entity.isChecked(), returned.isChecked());
+        Assert.assertNull(returned.getName());
+        Assert.assertEquals(entity.getI(), returned.getI());
+        Assert.assertNull(returned.getJ());
+
+        MongoCollection<Document> documentCollection = db.getCollection("test_nonnull", Document.class);
+        Document document = documentCollection.find().first();
+        Assert.assertTrue(document.containsKey("name"));
+        Assert.assertTrue(document.containsKey("i"));
+        Assert.assertFalse(document.containsKey("j"));
     }
 
     @Test
