@@ -187,7 +187,7 @@ class EntityCodec<T> implements CollectibleCodec<T> {
             } else {
                 Object value = info.getValue(t, field);
                 if (value != null || !info.isNonNull(field)) {
-                    document.put(field, info.getValue(t, field));
+                    document.put(field, value);
                 }
             }
         }
