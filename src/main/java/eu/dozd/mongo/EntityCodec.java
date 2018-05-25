@@ -108,7 +108,12 @@ class EntityCodec<T> implements CollectibleCodec<T> {
                 o = document.get(field);
 
                 if (info.getFieldType(field).isEnum()) {
-                    o = o == null ? null : Enum.valueOf((Class<? extends Enum>) info.getFieldType(field), (String) o);
+                    o = o == null 
+                            ? null
+                            : o instanceof Enum
+                                ? o
+                                // assume String here - if false, a ClassCastException is thrown
+                                : Enum.valueOf((Class<? extends Enum>) info.getFieldType(field), (String) o);
                 }
                 info.setValue(t, field, o);
             }
