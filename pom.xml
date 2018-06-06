@@ -26,6 +26,10 @@
             <name>Zdenek Dolezal</name>
             <email>zdenek.dolezal@gmail.com</email>
         </developer>
+        <developer>
+            <name>George Milev</name>
+            <email>georgimilevbg@abv.bg</email>
+        </developer>
     </developers>
 
     <scm>
