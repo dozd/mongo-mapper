@@ -4,7 +4,7 @@
 
     <groupId>eu.dozd</groupId>
     <artifactId>mongo-mapper</artifactId>
-    <version>1.0.12-RC-SNAPSHOT</version>
+    <version>1.0.11-SNAPSHOT</version>
 
     <name>Mongo Codecs for POJO mapping</name>
     <description>
